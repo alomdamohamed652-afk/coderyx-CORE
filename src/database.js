@@ -22,7 +22,13 @@ function getPool() {
   return pool;
 }
 
-async function migrate() {\n  const sql = fs.readFileSync(path.join(__dirname, "..", "database", "schema.sql"), "utf8");\n  await getPool().query(sql);\n  return { ok: true };\n}\n\nasync function health() {
+async function migrate() {
+  const sql = fs.readFileSync(path.join(__dirname, "..", "database", "schema.sql"), "utf8");
+  await getPool().query(sql);
+  return { ok: true };
+}
+
+async function health() {
   if (!pool) return { ok: false, backend: "postgresql", configured: false };
   try {
     const result = await pool.query("SELECT NOW() AS now");
