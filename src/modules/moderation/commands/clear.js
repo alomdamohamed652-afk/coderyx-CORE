@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { hasPermission } = require("../../../utils/permissions");
 const pendingActions = require("../../../utils/pendingActions");
+const caseManager = require("../../../utils/caseManager");
 
 const data = new SlashCommandBuilder()
   .setName("clear")
@@ -63,6 +64,7 @@ async function execute(interaction) {
       // Discord's bulk-delete endpoint يحتاج رسالتين على الأقل - رسالة واحدة تُحذف بالطريقة العادية
       pendingActions.record(`messageDelete:${toDelete[0].id}`, { executor: interaction.user, reason });
       await toDelete[0].delete();
+      caseManager.create({ guildId: interaction.guildId, action: "clear", target: targetUser, moderator: interaction.user, reason, source: "command" });
       await interaction.editReply({ content: "✅ تم حذف رسالة واحدة." });
       return;
     }
@@ -70,6 +72,7 @@ async function execute(interaction) {
     pendingActions.record(`bulkDelete:${channel.id}`, { executor: interaction.user, reason });
     const deleted = await channel.bulkDelete(toDelete, true);
 
+    caseManager.create({ guildId: interaction.guildId, action: "clear", target: targetUser, moderator: interaction.user, reason, source: "command" });
     await interaction.editReply({ content: `✅ تم حذف ${deleted.size} رسالة.` });
   } catch (err) {
     await interaction.editReply({ content: `❌ حصل خطأ أثناء الحذف: ${err.message}` });
