@@ -42,7 +42,8 @@ const toggleDefaults = {
   "logger.message.enabled": config.logger.message.enabled,
   "logger.general.enabled": config.logger.general.enabled,
   "logger.voice.enabled": config.logger.voice.enabled,
-  "logger.system.enabled": config.logger.system.enabled
+  "logger.system.enabled": config.logger.system.enabled,
+  "protection.enabled": config.protection.enabled
 };
 
 features.load(toggleDefaults);
