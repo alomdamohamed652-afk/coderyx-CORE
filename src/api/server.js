@@ -6,6 +6,8 @@ const caseManager = require("../utils/caseManager");
 const botRegistry = require("../utils/botRegistry");
 const featureCatalog = require("../utils/featureCatalog");
 const storage = require("../utils/storage");
+const fs = require("fs");
+const path = require("path");
 
 function json(res, status, body) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
@@ -35,6 +37,19 @@ function createApiServer({ client, apiKey = null, port = 0 }) {
   const server = http.createServer(async (req, res) => {
     try {
       const url = new URL(req.url, "http://localhost");
+      // Custom-coded dashboard static assets
+      if (req.method === "GET" && (url.pathname === "/" || url.pathname.startsWith("/dashboard/"))) {
+        const relative = url.pathname === "/" ? "index.html" : url.pathname.slice("/dashboard/".length);
+        const file = path.join(__dirname, "..", "..", "dashboard", relative);
+        const dashboardRoot = path.resolve(path.join(__dirname, "..", "..", "dashboard"));
+        if (path.resolve(file).startsWith(dashboardRoot) && fs.existsSync(file) && fs.statSync(file).isFile()) {
+          const ext = path.extname(file);
+          const types = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8" };
+          res.writeHead(200, { "Content-Type": types[ext] || "application/octet-stream" });
+          return res.end(fs.readFileSync(file));
+        }
+      }
+
       if (url.pathname === "/health") return json(res, 200, {
         ok: true, service: "coderyx-core", uptime: process.uptime(),
         discordReady: client.isReady(), storage: await storage.health()
