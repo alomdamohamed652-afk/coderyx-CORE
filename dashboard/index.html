@@ -6,7 +6,7 @@
 <aside class="sidebar"><div class="brand"><span class="brand-mark">C</span><div><b>CODERYX</b><small>CONTROL CENTER</small></div></div>
 <nav><button class="nav active" data-view="overview">⌂ <span>Overview</span></button><button class="nav" data-view="servers">▣ <span>Servers</span></button><button class="nav" data-view="moderation">⚔ <span>Moderation</span></button><button class="nav" data-view="protection">◈ <span>Protection</span></button><button class="nav" data-view="logging">☷ <span>Logging</span></button><button class="nav" data-view="welcome">✦ <span>Welcome</span></button></nav>
 <div class="side-bottom"><div class="status-dot"></div><span>Core API</span><strong id="apiStatus">checking</strong></div></aside>
-<main><header><div><span class="eyebrow">SERVER CONTROL</span><h1 id="pageTitle">Overview</h1></div><div class="header-actions"><select id="guildSelect"><option value="">Select server</option></select><button class="avatar">C</button></div></header>
+<main><header><div><span class="eyebrow">SERVER CONTROL</span><h1 id="pageTitle">Overview</h1></div><div class="header-actions"><select id="guildSelect"><option value="">Select server</option></select><span id="userName"></span><a id="loginBtn" class="login-btn" href="/api/auth/discord">Login with Discord</a><a id="logoutBtn" class="login-btn" href="/api/auth/logout" hidden>Logout</a><button class="avatar" id="userAvatar">C</button></div></header>
 <section id="content"></section>
 </main></div>
 <script src="/dashboard/app.js"></script>
