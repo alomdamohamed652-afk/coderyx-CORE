@@ -36,7 +36,14 @@ function validate(client, config) {
       }
     }
 
-    if (features.get("protection.enabled")) {\n      const channelId = config.protection?.channelId;\n      if (!channelId || !guild.channels.cache.has(channelId)) {\n        warnings.push(`قناة الحماية (protection.channelId) غير موجودة في سيرفر "${guild.name}".`);\n      }\n    }\n\n    for (const message of warnings) {
+    if (features.get("protection.enabled")) {
+      const channelId = config.protection?.channelId;
+      if (!channelId || !guild.channels.cache.has(channelId)) {
+        warnings.push(`قناة الحماية (protection.channelId) غير موجودة في سيرفر "${guild.name}".`);
+      }
+    }
+
+    for (const message of warnings) {
       devLog.warn(`[ConfigValidate] ${message}`);
       logger.system("warning", { title: "⚠️ مشكلة في الإعدادات", description: message, colorKey: "warning" }, guild);
     }
