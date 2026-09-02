@@ -5,7 +5,7 @@
 function loadEnv() {
   require("dotenv").config();
 
-  const token = process.env.BOT_TOKEN;
+  const token = process.env.DISCORD_TOKEN || process.env.BOT_TOKEN;
 
   if (!token || token.includes("YOUR_")) {
     throw new Error("[Env] BOT_TOKEN غير معبأ بشكل صحيح في ملف .env");
