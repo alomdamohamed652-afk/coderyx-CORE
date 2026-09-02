@@ -4,6 +4,8 @@ const devLog = require("../../utils/devLogger");
 const guildFeatures = require("../../utils/guildFeatures");
 const caseManager = require("../../utils/caseManager");
 const guildConfig = require("../../utils/guildConfig");
+const featureGuard = require("../../utils/featureGuard");
+const messageBuckets = new Map();
 
 function isExempt(member, config) {
   if (!member) return true;
@@ -11,6 +13,18 @@ function isExempt(member, config) {
   if (config.exemptUsers?.includes(member.id)) return true;
   if (member.roles?.cache?.some((role) => config.exemptRoles?.includes(role.id))) return true;
   return false;
+}
+
+function rateLimited(message, config) {
+  const limit = Number(config.maxMessages || 0);
+  if (limit <= 0) return false;
+  const windowMs = Number(config.windowMs || 5000);
+  const now = Date.now();
+  const key = `${message.guildId}:${message.author.id}`;
+  const recent = (messageBuckets.get(key) || []).filter((t) => now - t < windowMs);
+  recent.push(now);
+  messageBuckets.set(key, recent);
+  return recent.length > limit;
 }
 
 async function executeAction(message, config) {
@@ -86,7 +100,16 @@ module.exports = {
     bus.on("message:create", async (message) => {
       if (!guildFeatures.isEnabled(message.guildId, "protection", features.get("protection.enabled") === true)) return;
       if (!message.guild || message.channelId !== guildConfig.get(message.guildId, "protection.channelId", protection.channelId)) return;
-      await executeAction(message, { ...protection, ...(guildConfig.get(message.guildId, "protection", {}) || {}) });
+      const guildProtection = { ...protection, ...(guildConfig.get(message.guildId, "protection", {}) || {}) };
+      if (guildProtection.antiSpam && featureGuard.isEnabled(message.guildId, "automod", false) && rateLimited(message, guildProtection)) {
+        await executeAction(message, { ...guildProtection, action: guildProtection.spamAction || "timeout", reason: guildProtection.spamReason || "Anti-spam violation" });
+        return;
+      }
+      if (guildProtection.maxMentions && featureGuard.isEnabled(message.guildId, "automod", false) && (message.mentions?.users?.size || 0) >= guildProtection.maxMentions) {
+        await executeAction(message, { ...guildProtection, action: guildProtection.mentionAction || "timeout", reason: guildProtection.mentionReason || "Mass mention violation" });
+        return;
+      }
+      await executeAction(message, guildProtection);
     });
   }
 };
