@@ -6,9 +6,11 @@
 const branding = require("./branding");
 const welcome = require("./welcome");
 const logger = require("./logger");
+const protection = require("./protection");
 
 module.exports = {
   branding,
   welcome,
-  logger
+  logger,
+  protection
 };
