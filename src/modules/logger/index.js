@@ -691,7 +691,8 @@ async function onVoiceLeave({ member, channel }) {
   const result = await resolveExecutor({
     guild: member.guild,
     auditType: AuditLogEvent.MemberDisconnect,
-    targetId: member.id
+    targetId: member.id,
+    predicate: (e) => !e.extra?.channel?.id || e.extra.channel.id === channel?.id
   });
 
   if (result.executor) {
@@ -727,7 +728,10 @@ async function onVoiceMove({ member, oldChannel, newChannel }) {
   if (!loggerApi.isEnabled("voice", "move")) return;
   if (shouldIgnore(member.user)) return;
 
-  const result = await resolveExecutor({ guild: member.guild, auditType: AuditLogEvent.MemberMove, targetId: member.id });
+  const result = await resolveExecutor({ guild: member.guild, auditType: AuditLogEvent.MemberMove,
+    targetId: member.id,
+    predicate: (e) => !e.extra?.channel?.id || e.extra.channel.id === newChannel?.id
+  });
 
   await loggerApi.voice(
     "move",
