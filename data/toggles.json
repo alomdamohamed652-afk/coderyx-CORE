@@ -1,0 +1,12 @@
+{
+  "welcome.enabled": true,
+  "welcome.dm.enabled": true,
+  "welcome.goodbye.enabled": true,
+  "welcome.autoRole.enabled": true,
+  "logger.enabled": true,
+  "logger.member.enabled": true,
+  "logger.message.enabled": true,
+  "logger.general.enabled": true,
+  "logger.voice.enabled": true,
+  "logger.system.enabled": true
+}

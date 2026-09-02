@@ -1,0 +1,23 @@
+{
+  "name": "core-management-system",
+  "version": "1.0.0",
+  "description": "Codryx Core Management System - Welcome & Logger module for any Discord server",
+  "main": "src/index.js",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "diff": "^5.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
