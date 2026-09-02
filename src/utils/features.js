@@ -35,8 +35,12 @@ function load(defaults) {
   return state;
 }
 
-function get(key) {
-  return state[key];
+function get(key, fallback = undefined) {
+  return key in state ? state[key] : fallback;
+}
+
+function all() {
+  return { ...state };
 }
 
 function set(key, value) {
@@ -56,4 +60,4 @@ function saveToDisk(value) {
   fs.renameSync(tempPath, FILE_PATH);
 }
 
-module.exports = { load, get, set };
+module.exports = { load, get, set, all };
