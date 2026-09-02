@@ -18,6 +18,53 @@ function auth(req, apiKey) {
   const header = req.headers.authorization || "";
   return header === "Bearer " + apiKey;
 }
+function oauthConfig() {
+  return {
+    clientId: process.env.DISCORD_CLIENT_ID || process.env.CLIENT_ID || "",
+    clientSecret: process.env.DISCORD_CLIENT_SECRET || "",
+    redirectUri: process.env.DISCORD_REDIRECT_URI || "https://coderyx-core-production.up.railway.app/api/auth/discord/callback"
+  };
+}
+
+function parseCookies(req) {
+  const out = {};
+  for (const part of String(req.headers.cookie || "").split(";")) {
+    const i = part.indexOf("=");
+    if (i > 0) out[part.slice(0, i).trim()] = decodeURIComponent(part.slice(i + 1).trim());
+  }
+  return out;
+}
+
+async function discordToken(code) {
+  const cfg = oauthConfig();
+  const body = new URLSearchParams({
+    client_id: cfg.clientId,
+    client_secret: cfg.clientSecret,
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: cfg.redirectUri
+  });
+  const response = await fetch("https://discord.com/api/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body
+  });
+  if (!response.ok) throw new Error("Discord OAuth token exchange failed");
+  return response.json();
+}
+
+async function discordApi(pathname, token) {
+  const response = await fetch("https://discord.com/api" + pathname, {
+    headers: { Authorization: "Bearer " + token }
+  });
+  if (!response.ok) throw new Error("Discord API request failed: " + response.status);
+  return response.json();
+}
+
+function sessionCookie(value) {
+  return "coderyx_session=" + encodeURIComponent(value) + "; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=86400";
+}
+
 function readBody(req) {
   return new Promise((resolve, reject) => {
     let data = "";
@@ -48,6 +95,52 @@ function createApiServer({ client, apiKey = null, port = 0 }) {
           res.writeHead(200, { "Content-Type": types[ext] || "application/octet-stream" });
           return res.end(fs.readFileSync(file));
         }
+      }
+
+      if (url.pathname === "/api/auth/discord") {
+        const cfg = oauthConfig();
+        if (!cfg.clientId || !cfg.clientSecret) return json(res, 500, { error: "Discord OAuth is not configured" });
+        const authUrl = new URL("https://discord.com/oauth2/authorize");
+        authUrl.searchParams.set("client_id", cfg.clientId);
+        authUrl.searchParams.set("redirect_uri", cfg.redirectUri);
+        authUrl.searchParams.set("response_type", "code");
+        authUrl.searchParams.set("scope", "identify guilds");
+        res.writeHead(302, { Location: authUrl.toString() });
+        return res.end();
+      }
+
+      if (url.pathname === "/api/auth/discord/callback") {
+        const code = url.searchParams.get("code");
+        if (!code) return json(res, 400, { error: "Missing OAuth code" });
+        const tokens = await discordToken(code);
+        const user = await discordApi("/users/@me", tokens.access_token);
+        const guilds = await discordApi("/users/@me/guilds", tokens.access_token);
+        const session = Buffer.from(JSON.stringify({
+          user, guilds, accessToken: tokens.access_token, expiresAt: Date.now() + (tokens.expires_in || 86400) * 1000
+        })).toString("base64url");
+        res.writeHead(302, { "Set-Cookie": sessionCookie(session), Location: "/" });
+        return res.end();
+      }
+
+      if (url.pathname === "/api/auth/me" && req.method === "GET") {
+        const cookie = parseCookies(req).coderyx_session;
+        if (!cookie) return json(res, 401, { authenticated: false });
+        try {
+          const session = JSON.parse(Buffer.from(decodeURIComponent(cookie), "base64url").toString("utf8"));
+          if (!session.user || Date.now() > session.expiresAt) return json(res, 401, { authenticated: false });
+          const botGuildIds = new Set(client.guilds.cache.keys());
+          const manageableGuilds = (session.guilds || []).filter(g =>
+            g.owner === true || ((Number(g.permissions) & 0x20) === 0x20)
+          ).map(g => ({ ...g, botInstalled: botGuildIds.has(g.id) }));
+          return json(res, 200, { authenticated: true, user: session.user, guilds: manageableGuilds });
+        } catch {
+          return json(res, 401, { authenticated: false });
+        }
+      }
+
+      if (url.pathname === "/api/auth/logout") {
+        res.writeHead(302, { "Set-Cookie": "coderyx_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0", Location: "/" });
+        return res.end();
       }
 
       if (url.pathname === "/health") return json(res, 200, {
