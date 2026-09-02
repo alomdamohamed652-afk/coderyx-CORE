@@ -7,6 +7,7 @@ const logger = require("./utils/logger");
 const devLog = require("./utils/devLogger");
 const { loadEvents } = require("./utils/eventLoader");
 const { discoverModules, loadModules } = require("./utils/moduleLoader");
+const { createApiServer } = require("./api/server");
 
 const config = require("../config");
 const env = loadEnv();
@@ -54,7 +55,7 @@ const context = { client, bus, config, env };
 loadEvents(client, context);
 loadModules(modules, context);
 
-const apiServer = createApiServer({ client, apiKey: env.apiKey, port: env.apiPort });
+const apiServer = createApiServer({ client, apiKey: env.apiKey, port: env.apiPort, supabaseUrl: env.supabaseUrl, supabaseKey: env.supabaseKey });
 devLog.success(`[API] Core API listening on port ${env.apiPort}`);
 process.on("SIGTERM", () => apiServer.close(() => process.exit(0)));
 
