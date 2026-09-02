@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require("discord.js");
 const { hasPermission } = require("../../../utils/permissions");
 const pendingActions = require("../../../utils/pendingActions");
+const caseManager = require("../../../utils/caseManager");
 
 const data = new SlashCommandBuilder()
   .setName("slowmode")
@@ -33,6 +34,7 @@ async function execute(interaction) {
     await channel.setRateLimitPerUser(seconds);
 
     const message = seconds === 0 ? `✅ تم إيقاف Slowmode في ${channel}.` : `✅ تم تفعيل Slowmode (${seconds} ثانية) في ${channel}.`;
+    caseManager.create({ guildId: interaction.guildId, action: "slowmode", target: { id: channel.id, tag: channel.name }, moderator: interaction.user, reason: `/slowmode (${seconds}s)`, source: "command" });
     await interaction.editReply({ content: message });
   } catch (err) {
     await interaction.editReply({ content: `❌ حصل خطأ: ${err.message}` });
