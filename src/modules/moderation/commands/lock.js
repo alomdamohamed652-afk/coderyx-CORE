@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require("discord.js");
 const { hasPermission } = require("../../../utils/permissions");
 const pendingActions = require("../../../utils/pendingActions");
+const caseManager = require("../../../utils/caseManager");
 
 const data = new SlashCommandBuilder()
   .setName("lock")
@@ -24,6 +25,7 @@ async function execute(interaction) {
   try {
     pendingActions.record(`channelUpdate:${channel.id}`, { executor: interaction.user, reason });
     await channel.permissionOverwrites.edit(interaction.guild.roles.everyone, { SendMessages: false }, { reason });
+    caseManager.create({ guildId: interaction.guildId, action: "lock", target: { id: channel.id, tag: channel.name }, moderator: interaction.user, reason, source: "command" });
     await interaction.editReply({ content: `🔒 تم قفل ${channel}.` });
   } catch (err) {
     await interaction.editReply({ content: `❌ ماقدرتش أقفل الروم: ${err.message}` });
