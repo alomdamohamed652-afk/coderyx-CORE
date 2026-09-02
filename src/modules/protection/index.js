@@ -3,6 +3,7 @@ const logger = require("../../utils/logger");
 const devLog = require("../../utils/devLogger");
 const guildFeatures = require("../../utils/guildFeatures");
 const caseManager = require("../../utils/caseManager");
+const guildConfig = require("../../utils/guildConfig");
 
 function isExempt(member, config) {
   if (!member) return true;
@@ -62,8 +63,8 @@ module.exports = {
   enabledByDefault: false,
   dependencies: ["logger"],
 
-  init({ bus, config }) {
-    const protection = config.protection;
+  init({ bus, config, guildId }) {
+    const protection = { ...(config.protection || {}), ...guildConfig.get(guildId || "", "protection", {}) };
     if (!protection?.channelId) {
       devLog.warn("[Protection] لم يتم تحديد channelId.");
       return;
