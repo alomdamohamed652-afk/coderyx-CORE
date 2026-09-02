@@ -82,7 +82,7 @@ function createApiServer({ client, apiKey = null, port = 0 }) {
         }
       }
 
-      if (parts[2] === "bots" && req.method === "GET") {
+      if (parts[2] === "me" && req.method === "GET") {\n        const ownerId = url.searchParams.get("ownerId");\n        if (!ownerId) return json(res, 400, { error: "ownerId is required" });\n        const bots = botRegistry.listByOwner(ownerId);\n        const guilds = bots.flatMap(b => b.guilds.map(id => ({ id, name: client.guilds.cache.get(id)?.name || null, botId: b.botId })));\n        return json(res, 200, { ownerId, bots, guilds });\n      }\n\n      if (parts[2] === "bots" && req.method === "GET") {
         const ownerId = url.searchParams.get("ownerId");
         return json(res, 200, ownerId ? botRegistry.listByOwner(ownerId) : { error: "ownerId is required" });
       }
