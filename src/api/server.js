@@ -11,7 +11,7 @@ function json(res, status, body) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(body));
 }
-function auth(req, apiKey) {
+async function resolveUser(req, supabaseUrl, supabaseKey) {\n  const header = req.headers.authorization || "";\n  if (!header.startsWith("Bearer ") || !supabaseUrl || !supabaseKey) return null;\n  const response = await fetch(`${supabaseUrl.replace(/\\/$/, "")}/auth/v1/user`, { headers: { apikey: supabaseKey, Authorization: header } });\n  if (!response.ok) return null;\n  return response.json();\n}\n\nfunction auth(req, apiKey) {
   if (!apiKey) return true;
   const header = req.headers.authorization || "";
   return header === "Bearer " + apiKey;
@@ -31,7 +31,7 @@ function readBody(req) {
   });
 }
 
-function createApiServer({ client, apiKey = null, port = 0 }) {
+function createApiServer({ client, apiKey = null, port = 0, supabaseUrl = null, supabaseKey = null }) {
   const server = http.createServer(async (req, res) => {
     try {
       const url = new URL(req.url, "http://localhost");
@@ -39,7 +39,7 @@ function createApiServer({ client, apiKey = null, port = 0 }) {
         ok: true, service: "coderyx-core", uptime: process.uptime(),
         discordReady: client.isReady(), storage: await storage.health()
       });
-      if (!auth(req, apiKey)) return json(res, 401, { error: "Unauthorized" });
+      const internalAuth = auth(req, apiKey);\n      const user = await resolveUser(req, supabaseUrl, supabaseKey);\n      if (!internalAuth && !user) return json(res, 401, { error: "Unauthorized" });
 
       const parts = url.pathname.split("/").filter(Boolean);
       if (parts[0] !== "api" || parts[1] !== "v1") return json(res, 404, { error: "Not found" });
@@ -82,7 +82,7 @@ function createApiServer({ client, apiKey = null, port = 0 }) {
         }
       }
 
-      if (parts[2] === "me" && req.method === "GET") {\n        const ownerId = url.searchParams.get("ownerId");\n        if (!ownerId) return json(res, 400, { error: "ownerId is required" });\n        const bots = botRegistry.listByOwner(ownerId);\n        const guilds = bots.flatMap(b => b.guilds.map(id => ({ id, name: client.guilds.cache.get(id)?.name || null, botId: b.botId })));\n        return json(res, 200, { ownerId, bots, guilds });\n      }\n\n      if (parts[2] === "bots" && req.method === "GET") {
+      if (parts[2] === "me" && req.method === "GET") {\n        const ownerId = user?.id || url.searchParams.get("ownerId");\n        if (!ownerId) return json(res, 400, { error: "Authenticated owner is required" });\n        const bots = botRegistry.listByOwner(ownerId);\n        const guilds = bots.flatMap(b => b.guilds.map(id => ({ id, name: client.guilds.cache.get(id)?.name || null, botId: b.botId })));\n        return json(res, 200, { ownerId, bots, guilds });\n      }\n\n      if (parts[2] === "bots" && req.method === "GET") {
         const ownerId = url.searchParams.get("ownerId");
         return json(res, 200, ownerId ? botRegistry.listByOwner(ownerId) : { error: "ownerId is required" });
       }
