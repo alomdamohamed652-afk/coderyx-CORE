@@ -187,7 +187,7 @@ async function onMemberTimeoutRemoved({ member }) {
       thumbnail: member.user.displayAvatarURL(),
       fields: [
         { name: "العضو (المستهدف)", value: `${member} (\`${member.user.tag}\`)` },
-        { name: "المنفذ (Executor)", value: result.executor?.tag || "انتهت المدة تلقائياً", inline: true }
+        { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "انتهت المدة تلقائياً", inline: true }
       ],
       colorKey: "success"
     },
