@@ -54,6 +54,8 @@ function createApiServer({ client, apiKey = null, port = 0 }) {
         ok: true, service: "coderyx-core", uptime: process.uptime(),
         discordReady: client.isReady(), storage: await storage.health()
       });
+      // Browser dashboard must never receive the Core API key. It is only used server-to-server.
+      // Static dashboard routes are public for now; protected API routes still require Bearer auth.
       if (!auth(req, apiKey)) return json(res, 401, { error: "Unauthorized" });
 
       const parts = url.pathname.split("/").filter(Boolean);
