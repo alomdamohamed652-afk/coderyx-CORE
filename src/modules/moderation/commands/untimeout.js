@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { hasPermission } = require("../../../utils/permissions");
 const pendingActions = require("../../../utils/pendingActions");
+const caseManager = require("../../../utils/caseManager");
 
 const data = new SlashCommandBuilder()
   .setName("untimeout")
@@ -27,6 +28,7 @@ async function execute(interaction) {
   try {
     pendingActions.record(`untimeout:${target.id}`, { executor: interaction.user, reason });
     await member.timeout(null, reason);
+    caseManager.create({ guildId: interaction.guildId, action: "untimeout", target, moderator: interaction.user, reason, source: "command" });
     await interaction.editReply({ content: `✅ تم إلغاء التقييد عن ${target.tag}.` });
   } catch (err) {
     await interaction.editReply({ content: `❌ حصل خطأ: ${err.message}` });
