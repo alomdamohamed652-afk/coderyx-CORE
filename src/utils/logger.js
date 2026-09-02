@@ -36,7 +36,10 @@ async function send(category, eventKey, options = {}, guild) {
   if (!isEnabled(category, eventKey)) return;
 
   const sectionConfig = _config?.[category];
-  const channel = await resolveChannel(sectionConfig);
+  const eventChannelId = sectionConfig?.eventChannels?.[eventKey];
+  const channel = eventChannelId
+    ? await resolveChannel({ ...sectionConfig, channelId: eventChannelId })
+    : await resolveChannel(sectionConfig);
   if (!channel?.isTextBased?.()) {
     devLog.warn(`[Logger] لا توجد قناة نصية صالحة لقسم "${category}".`);
     return;
