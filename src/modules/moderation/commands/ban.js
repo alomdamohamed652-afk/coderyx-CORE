@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { hasPermission } = require("../../../utils/permissions");
 const pendingActions = require("../../../utils/pendingActions");
+const caseManager = require("../../../utils/caseManager");
 
 const data = new SlashCommandBuilder()
   .setName("ban")
@@ -26,6 +27,7 @@ async function execute(interaction) {
   try {
     pendingActions.record(`ban:${user.id}`, { executor: interaction.user, reason });
     await interaction.guild.members.ban(user, { reason, deleteMessageSeconds: deleteDays * 86400 });
+    caseManager.create({ guildId: interaction.guildId, action: "ban", target: user, moderator: interaction.user, reason, source: "command" });
     await interaction.editReply({ content: `✅ تم حظر ${user.tag}.` });
   } catch (err) {
     await interaction.editReply({ content: `❌ ماقدرتش أحظر العضو: ${err.message}` });
