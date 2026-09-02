@@ -26,7 +26,7 @@ function setEnabled(guildId, feature, enabled) {
 
 function snapshot(guildId) {
   const prefix = `guild.${guildId}.`;
-  return Object.keys(features.load({})).filter((k) => k.startsWith(prefix))
+  return Object.keys(features.all()).filter((k) => k.startsWith(prefix))
     .reduce((out, k) => {
       out[k.slice(prefix.length)] = features.get(k);
       return out;
