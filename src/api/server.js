@@ -98,7 +98,7 @@ function dashboardGuilds(session, client) {
     return {
       id,
       name: bg?.name || og?.name || "Unknown Server",
-      icon: bg?.iconURL({ size: 128, extension: "png" }) || (og?.icon ? `https://cdn.discordapp.com/icons/${id}/${og.icon}.png?size=128` : null),
+      icon: bg?.iconURL({ size: 128, extension: "png" }) || (og?.icon ? "https://cdn.discordapp.com/icons/" + id + "/" + og.icon + ".png?size=128" : null),
       botInstalled: botIds.has(id),
       owner: og?.owner === true,
       canManage: session?.user?.id === SUPER_ADMIN_ID || og?.owner === true || ((Number(og?.permissions || 0) & 0x20) === 0x20),
