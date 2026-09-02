@@ -16,7 +16,7 @@ function truncate(text, max = 1000) {
 
 function executorFields(result) {
   return [
-    { name: "المنفذ (Executor)", value: result.executor?.tag || "غير معروف", inline: true },
+    { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "غير معروف", inline: true },
     { name: "السبب (Reason)", value: result.reason || "بدون سبب", inline: true }
   ];
 }
@@ -109,7 +109,7 @@ async function onMemberBan(ban) {
       thumbnail: ban.user.displayAvatarURL(),
       fields: [
         { name: "العضو (المستهدف)", value: `${ban.user.tag} (\`${ban.user.id}\`)` },
-        { name: "المنفذ (Executor)", value: result.executor?.tag || "غير معروف", inline: true },
+        { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "غير معروف", inline: true },
         { name: "السبب (Reason)", value: ban.reason || result.reason || "بدون سبب", inline: true }
       ],
       colorKey: "danger"
@@ -237,7 +237,7 @@ async function onRoleAdded({ member, roles }) {
       fields: [
         { name: "العضو (المستهدف)", value: `${member}` },
         { name: "الرول", value: roles.map((r) => r.toString()).join(", ") },
-        { name: "المنفذ (Executor)", value: result.executor?.tag || "غير معروف", inline: true }
+        { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "غير معروف", inline: true }
       ],
       colorKey: "success"
     },
@@ -259,7 +259,7 @@ async function onRoleRemoved({ member, roles }) {
       fields: [
         { name: "العضو (المستهدف)", value: `${member}` },
         { name: "الرول", value: roles.map((r) => r.toString()).join(", ") },
-        { name: "المنفذ (Executor)", value: result.executor?.tag || "غير معروف", inline: true }
+        { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "غير معروف", inline: true }
       ],
       colorKey: "danger"
     },
@@ -754,7 +754,7 @@ async function onVoiceServerMute({ member, channel }) {
     guild: member.guild,
     auditType: AuditLogEvent.MemberUpdate,
     targetId: member.id,
-    extraCheck: (e) => e.changes?.some((c) => c.key === "mute")
+    extraCheck: (e) => e.changes?.some((c) => c.key === "mute" && c.new === true)
   });
 
   await loggerApi.voice(
@@ -765,7 +765,7 @@ async function onVoiceServerMute({ member, channel }) {
       fields: [
         { name: "العضو (المستهدف)", value: `${member}`, inline: true },
         { name: "الروم", value: channel ? `${channel}` : "—", inline: true },
-        { name: "المنفذ (Executor)", value: result.executor?.tag || "غير معروف", inline: true }
+        { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "غير معروف", inline: true }
       ],
       colorKey: "warning"
     },
@@ -781,7 +781,7 @@ async function onVoiceServerUnmute({ member, channel }) {
     guild: member.guild,
     auditType: AuditLogEvent.MemberUpdate,
     targetId: member.id,
-    extraCheck: (e) => e.changes?.some((c) => c.key === "mute")
+    extraCheck: (e) => e.changes?.some((c) => c.key === "mute" && c.new === true)
   });
 
   await loggerApi.voice(
@@ -792,7 +792,7 @@ async function onVoiceServerUnmute({ member, channel }) {
       fields: [
         { name: "العضو (المستهدف)", value: `${member}`, inline: true },
         { name: "الروم", value: channel ? `${channel}` : "—", inline: true },
-        { name: "المنفذ (Executor)", value: result.executor?.tag || "غير معروف", inline: true }
+        { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "غير معروف", inline: true }
       ],
       colorKey: "success"
     },
@@ -808,7 +808,7 @@ async function onVoiceServerDeafen({ member, channel }) {
     guild: member.guild,
     auditType: AuditLogEvent.MemberUpdate,
     targetId: member.id,
-    extraCheck: (e) => e.changes?.some((c) => c.key === "deaf")
+    extraCheck: (e) => e.changes?.some((c) => c.key === "deaf" && c.new === true)
   });
 
   await loggerApi.voice(
@@ -819,7 +819,7 @@ async function onVoiceServerDeafen({ member, channel }) {
       fields: [
         { name: "العضو (المستهدف)", value: `${member}`, inline: true },
         { name: "الروم", value: channel ? `${channel}` : "—", inline: true },
-        { name: "المنفذ (Executor)", value: result.executor?.tag || "غير معروف", inline: true }
+        { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "غير معروف", inline: true }
       ],
       colorKey: "warning"
     },
@@ -835,7 +835,7 @@ async function onVoiceServerUndeafen({ member, channel }) {
     guild: member.guild,
     auditType: AuditLogEvent.MemberUpdate,
     targetId: member.id,
-    extraCheck: (e) => e.changes?.some((c) => c.key === "deaf")
+    extraCheck: (e) => e.changes?.some((c) => c.key === "deaf" && c.new === true)
   });
 
   await loggerApi.voice(
@@ -846,7 +846,7 @@ async function onVoiceServerUndeafen({ member, channel }) {
       fields: [
         { name: "العضو (المستهدف)", value: `${member}`, inline: true },
         { name: "الروم", value: channel ? `${channel}` : "—", inline: true },
-        { name: "المنفذ (Executor)", value: result.executor?.tag || "غير معروف", inline: true }
+        { name: "المنفذ (Executor)", value: result.executor ? `<@${result.executor.id}>` : "غير معروف", inline: true }
       ],
       colorKey: "success"
     },
