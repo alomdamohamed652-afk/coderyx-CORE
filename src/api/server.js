@@ -11,14 +11,6 @@ function json(res, status, body) {
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(body));
 }
-async function resolveUser(req, supabaseUrl, supabaseKey) {
-  const header = req.headers.authorization || "";
-  if (!header.startsWith("Bearer ") || !supabaseUrl || !supabaseKey) return null;
-  const response = await fetch(`${supabaseUrl.replace(/\\/$/, "")}/auth/v1/user`, { headers: { apikey: supabaseKey, Authorization: header } });
-  if (!response.ok) return null;
-  return response.json();
-}
-
 function auth(req, apiKey) {
   if (!apiKey) return true;
   const header = req.headers.authorization || "";
