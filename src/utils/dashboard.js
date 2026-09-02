@@ -27,7 +27,8 @@ const TOGGLES = [
   { key: "logger.message.enabled", label: "Message Logs" },
   { key: "logger.general.enabled", label: "General Logs" },
   { key: "logger.voice.enabled", label: "Voice Logs" },
-  { key: "logger.system.enabled", label: "System Logs" }
+  { key: "logger.system.enabled", label: "System Logs" },
+  { key: "protection.enabled", label: "Protection Channel" }
 ];
 
 function buildDashboardPayload(branding) {
