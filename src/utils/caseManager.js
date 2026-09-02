@@ -38,8 +38,8 @@ function create({ guildId, action, target, moderator, reason, duration, source =
 function list(guildId, limit = 50) {
   return (state[guildId]?.cases || []).slice(-limit).reverse();
 }
-function get(guildId, id) {
+function getForUser(guildId, userId, limit = 50) {\n  return (state[guildId]?.cases || []).filter((c) => c.targetId === userId).slice(-limit).reverse();\n}\nfunction count(guildId, userId = null) {\n  const cases = state[guildId]?.cases || [];\n  return userId ? cases.filter((c) => c.targetId === userId).length : cases.length;\n}\nfunction get(guildId, id) {
   return (state[guildId]?.cases || []).find((c) => c.id === Number(id)) || null;
 }
 load();
-module.exports = { create, list, get, load };
+module.exports = { create, list, get, getForUser, count, load };
