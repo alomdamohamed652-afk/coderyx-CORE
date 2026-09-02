@@ -754,7 +754,7 @@ async function onVoiceServerMute({ member, channel }) {
     guild: member.guild,
     auditType: AuditLogEvent.MemberUpdate,
     targetId: member.id,
-    extraCheck: (e) => e.changes?.some((c) => c.key === "mute" && c.new === false)
+    extraCheck: (e) => e.changes?.some((c) => c.key === "mute" && c.new === true)
   });
 
   await loggerApi.voice(
@@ -781,7 +781,7 @@ async function onVoiceServerUnmute({ member, channel }) {
     guild: member.guild,
     auditType: AuditLogEvent.MemberUpdate,
     targetId: member.id,
-    extraCheck: (e) => e.changes?.some((c) => c.key === "mute" && c.new === true)
+    extraCheck: (e) => e.changes?.some((c) => c.key === "mute" && c.new === false)
   });
 
   await loggerApi.voice(
@@ -808,7 +808,7 @@ async function onVoiceServerDeafen({ member, channel }) {
     guild: member.guild,
     auditType: AuditLogEvent.MemberUpdate,
     targetId: member.id,
-    extraCheck: (e) => e.changes?.some((c) => c.key === "deaf" && c.new === false)
+    extraCheck: (e) => e.changes?.some((c) => c.key === "deaf" && c.new === true)
   });
 
   await loggerApi.voice(
@@ -835,7 +835,7 @@ async function onVoiceServerUndeafen({ member, channel }) {
     guild: member.guild,
     auditType: AuditLogEvent.MemberUpdate,
     targetId: member.id,
-    extraCheck: (e) => e.changes?.some((c) => c.key === "deaf" && c.new === true)
+    extraCheck: (e) => e.changes?.some((c) => c.key === "deaf" && c.new === false)
   });
 
   await loggerApi.voice(
