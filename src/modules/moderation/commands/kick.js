@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { hasPermission } = require("../../../utils/permissions");
 const pendingActions = require("../../../utils/pendingActions");
+const caseManager = require("../../../utils/caseManager");
 
 const data = new SlashCommandBuilder()
   .setName("kick")
@@ -27,6 +28,7 @@ async function execute(interaction) {
   try {
     pendingActions.record(`kick:${target.id}`, { executor: interaction.user, reason });
     await member.kick(reason);
+    caseManager.create({ guildId: interaction.guildId, action: "kick", target, moderator: interaction.user, reason, source: "command" });
     await interaction.editReply({ content: `✅ تم طرد ${target.tag}.` });
   } catch (err) {
     await interaction.editReply({ content: `❌ ماقدرتش أطرد العضو: ${err.message}` });
