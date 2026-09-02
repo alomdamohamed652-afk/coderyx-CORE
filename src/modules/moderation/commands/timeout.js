@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { hasPermission } = require("../../../utils/permissions");
 const pendingActions = require("../../../utils/pendingActions");
+const caseManager = require("../../../utils/caseManager");
 
 const data = new SlashCommandBuilder()
   .setName("timeout")
@@ -36,6 +37,7 @@ async function execute(interaction) {
   try {
     pendingActions.record(`timeout:${target.id}`, { executor: interaction.user, reason });
     await member.timeout(minutes * 60 * 1000, reason);
+    caseManager.create({ guildId: interaction.guildId, action: "timeout", target, moderator: interaction.user, reason, duration: minutes * 60, source: "command" });
     await interaction.editReply({ content: `✅ تم تقييد ${target.tag} لمدة ${minutes} دقيقة.` });
   } catch (err) {
     await interaction.editReply({ content: `❌ ماقدرتش أقيّد العضو: ${err.message}` });
