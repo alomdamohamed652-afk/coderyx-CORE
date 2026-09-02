@@ -1,13 +1,14 @@
 <!doctype html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CODERYX Control Center</title><link rel="stylesheet" href="/dashboard/style.css"></head>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#07090d"><title>CODERYX // Core Console</title><link rel="stylesheet" href="/dashboard/style.css"></head>
 <body>
-<div class="app">
-<aside class="sidebar"><div class="brand"><span class="brand-mark">C</span><div><b>CODERYX</b><small>CONTROL CENTER</small></div></div>
-<nav><button class="nav active" data-view="overview">⌂ <span>Overview</span></button><button class="nav" data-view="servers">▣ <span>Servers</span></button><button class="nav" data-view="moderation">⚔ <span>Moderation</span></button><button class="nav" data-view="protection">◈ <span>Protection</span></button><button class="nav" data-view="logging">☷ <span>Logging</span></button><button class="nav" data-view="welcome">✦ <span>Welcome</span></button></nav>
-<div class="side-bottom"><div class="status-dot"></div><span>Core API</span><strong id="apiStatus">checking</strong></div></aside>
-<main><header><div><span class="eyebrow">SERVER CONTROL</span><h1 id="pageTitle">Overview</h1></div><div class="header-actions"><select id="guildSelect"><option value="">Select server</option></select><span id="userName"></span><a id="loginBtn" class="login-btn" href="/api/auth/discord">Login with Discord</a><a id="logoutBtn" class="login-btn" href="/api/auth/logout" hidden>Logout</a><button class="avatar" id="userAvatar">C</button></div></header>
-<section id="content"></section>
-</main></div>
-<script src="/dashboard/app.js"></script>
-</body></html>
+<div class="scanlines"></div><div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">&lt;/&gt;</div><div><b>CODERYX</b><small>CORE CONSOLE</small></div></div>
+  <div class="nav-label">WORKSPACE</div>
+  <nav><button class="nav active" data-view="overview"><span>01</span> Overview</button><button class="nav" data-view="servers"><span>02</span> Servers</button><button class="nav" data-view="moderation"><span>03</span> Moderation</button><button class="nav" data-view="protection"><span>04</span> Protection</button><button class="nav" data-view="logging"><span>05</span> Logging</button><button class="nav" data-view="welcome"><span>06</span> Welcome</button></nav>
+  <div class="terminal-note"><span>STATUS</span><b><i></i> CORE ONLINE</b><code>~/coderyx/core</code></div>
+</aside>
+<main>
+<header><div><span class="eyebrow">CODERYX / CONTROL PLANE</span><h1 id="pageTitle">Overview</h1></div><div class="header-actions"><select id="guildSelect"><option value="">Select server</option></select><span id="userName"></span><span id="adminBadge" class="admin-badge"></span><a id="loginBtn" class="primary-btn small" href="/api/auth/discord">Discord Login</a><a id="logoutBtn" class="ghost-btn" href="/api/auth/logout" hidden>Logout</a><button class="avatar" id="userAvatar">C</button></div></header>
+<section id="serverStrip"></section><section id="content"></section>
+</main></div><div id="toast"></div><script>window.CORE_CLIENT_ID="__CORE_CLIENT_ID__";</script><script src="/dashboard/app.js"></script></body></html>
