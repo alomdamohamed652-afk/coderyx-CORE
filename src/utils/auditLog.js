@@ -13,7 +13,9 @@ async function findRecentAuditEntry(guild, { type, targetId, withinMs = 5000, ex
     const entry = audit.entries.find((e) => {
       if (targetId && e.target?.id !== targetId) return false;
       if (Date.now() - e.createdTimestamp > withinMs) return false;
-      if (extraCheck && !extraCheck(e)) return false;\n      if (actionId && e.id !== actionId) return false;\n      if (predicate && !predicate(e)) return false;
+      if (extraCheck && !extraCheck(e)) return false;
+      if (actionId && e.id !== actionId) return false;
+      if (predicate && !predicate(e)) return false;
       return true;
     });
     return entry || null;
