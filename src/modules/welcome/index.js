@@ -2,6 +2,7 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { buildEmbed } = require("../../utils/embedBuilder");
 const { applyPlaceholders } = require("../../utils/placeholders");
 const features = require("../../utils/features");
+const guildFeatures = require("../../utils/guildFeatures");
 const devLog = require("../../utils/devLogger");
 
 /**
@@ -80,7 +81,7 @@ async function sendChannelMessage(member, welcomeConfig, branding) {
 }
 
 async function sendDirectMessage(member, welcomeConfig, branding) {
-  if (!features.get("welcome.dm.enabled")) return;
+  if (!guildFeatures.isEnabled(member.guild.id, "welcome.dm", features.get("welcome.dm.enabled") === true)) return;
 
   try {
     const e = welcomeConfig.dm.embed;
@@ -101,7 +102,7 @@ async function sendDirectMessage(member, welcomeConfig, branding) {
 }
 
 async function assignAutoRole(member, welcomeConfig) {
-  if (!features.get("welcome.autoRole.enabled")) return;
+  if (!guildFeatures.isEnabled(member.guild.id, "welcome.autoRole", features.get("welcome.autoRole.enabled") === true)) return;
   if (member.user.bot && welcomeConfig.autoRole.ignoreBots) return;
 
   const roleId = welcomeConfig.autoRole.roleId;
@@ -118,7 +119,7 @@ async function assignAutoRole(member, welcomeConfig) {
 }
 
 async function sendGoodbyeMessage(member, welcomeConfig, branding) {
-  if (!features.get("welcome.goodbye.enabled")) return;
+  if (!guildFeatures.isEnabled(member.guild.id, "welcome.goodbye", features.get("welcome.goodbye.enabled") === true)) return;
 
   // لو لم تُحدَّد قناة وداع، تُستخدم نفس روم الترحيب
   const channelId = welcomeConfig.goodbye.channelId || welcomeConfig.message.channelId;
@@ -164,7 +165,7 @@ module.exports = {
   init({ bus, config }) {
     bus.on("member:join", (member) => {
       // المفتاح الرئيسي يتحكم فيه /dashboard ("Welcome System") وقت التشغيل
-      if (!features.get("welcome.enabled")) return;
+      if (!guildFeatures.isEnabled(member.guild.id, "welcome", features.get("welcome.enabled") === true)) return;
 
       sendChannelMessage(member, config.welcome, config.branding);
       sendDirectMessage(member, config.welcome, config.branding);
