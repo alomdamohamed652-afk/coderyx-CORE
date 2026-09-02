@@ -14,7 +14,9 @@ function loadEnv() {
   return {
     token,
     clientId: process.env.CLIENT_ID || null,
-    guildId: process.env.GUILD_ID || null
+    guildId: process.env.GUILD_ID || null,
+    apiKey: process.env.DASHBOARD_API_KEY || null,
+    apiPort: Number(process.env.API_PORT || 3000)
   };
 }
 
