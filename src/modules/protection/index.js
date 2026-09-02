@@ -77,7 +77,8 @@ module.exports = {
 
   init({ bus, config }) {
     const protectionDefaults = config.protection || {};
-    const protection = protectionDefaults;\n    if (!protection?.channelId) {
+    const protection = protectionDefaults;
+    if (!protection?.channelId) {
       devLog.warn("[Protection] لم يتم تحديد channelId.");
       return;
     }
