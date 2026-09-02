@@ -7,13 +7,13 @@ const devLog = require("./devLogger");
  *
  * يتطلب صلاحية "View Audit Log" للبوت.
  */
-async function findRecentAuditEntry(guild, { type, targetId, withinMs = 5000, extraCheck } = {}) {
+async function findRecentAuditEntry(guild, { type, targetId, withinMs = 5000, extraCheck, actionId, predicate } = {}) {
   try {
-    const audit = await guild.fetchAuditLogs({ type, limit: 5 });
+    const audit = await guild.fetchAuditLogs({ type, limit: 10 });
     const entry = audit.entries.find((e) => {
       if (targetId && e.target?.id !== targetId) return false;
       if (Date.now() - e.createdTimestamp > withinMs) return false;
-      if (extraCheck && !extraCheck(e)) return false;
+      if (extraCheck && !extraCheck(e)) return false;\n      if (actionId && e.id !== actionId) return false;\n      if (predicate && !predicate(e)) return false;
       return true;
     });
     return entry || null;
