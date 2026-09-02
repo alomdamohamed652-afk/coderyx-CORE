@@ -54,6 +54,10 @@ const context = { client, bus, config, env };
 loadEvents(client, context);
 loadModules(modules, context);
 
+const apiServer = createApiServer({ client, apiKey: env.apiKey, port: env.apiPort });
+devLog.success(`[API] Core API listening on port ${env.apiPort}`);
+process.on("SIGTERM", () => apiServer.close(() => process.exit(0)));
+
 process.on("unhandledRejection", (error) => {
   devLog.error(`Unhandled Rejection: ${error?.message || error}`);
   logger.system("error", { title: "🔴 Unhandled Rejection", description: String(error?.stack || error), colorKey: "danger" });
