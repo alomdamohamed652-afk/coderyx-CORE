@@ -7,7 +7,6 @@ const logger = require("./utils/logger");
 const devLog = require("./utils/devLogger");
 const { loadEvents } = require("./utils/eventLoader");
 const { discoverModules, loadModules } = require("./utils/moduleLoader");
-const { createApiServer } = require("./api/server");
 const database = require("./database");
 
 const config = require("../config");
@@ -63,9 +62,7 @@ if (env.databaseUrl) {
   devLog.warn("[Database] DATABASE_URL is not configured; using local storage until PostgreSQL is connected.");
 }
 
-const apiServer = createApiServer({ client, apiKey: env.apiKey, port: env.apiPort });
-devLog.success(`[API] Core API listening on port ${env.apiPort}`);
-process.on("SIGTERM", () => apiServer.close(async () => { await database.close(); process.exit(0); }));
+process.on("SIGTERM", async () => { await database.close(); process.exit(0); });
 
 process.on("unhandledRejection", (error) => {
   devLog.error(`Unhandled Rejection: ${error?.message || error}`);
