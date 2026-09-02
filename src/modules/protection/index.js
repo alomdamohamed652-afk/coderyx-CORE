@@ -41,7 +41,19 @@ async function executeAction(message, config) {
       success = await member.ban({ reason }).then(() => true).catch(() => false);
     }
 
-    if (success && action !== "delete") {\n      caseManager.create({\n        guildId: message.guildId,\n        action: `protection:${action}`,\n        target: member.user,\n        moderator: message.client.user,\n        reason,\n        duration: action === "timeout" ? Math.floor((config.timeoutMs || 600000) / 1000) : null,\n        source: "protection"\n      });\n    }\n\n    await logger.general("protectionAction", {
+    if (success && action !== "delete") {
+      caseManager.create({
+        guildId: message.guildId,
+        action: `protection:${action}`,
+        target: member.user,
+        moderator: message.client.user,
+        reason,
+        duration: action === "timeout" ? Math.floor((config.timeoutMs || 600000) / 1000) : null,
+        source: "protection"
+      });
+    }
+
+    await logger.general("protectionAction", {
       title: success ? "🛡️ تم تنفيذ حماية القناة" : "⚠️ تعذر تنفيذ حماية القناة",
       fields: [
         { name: "المستخدم", value: "<@" + member.id + ">", inline: true },
@@ -63,17 +75,17 @@ module.exports = {
   enabledByDefault: false,
   dependencies: ["logger"],
 
-  init({ bus, config, guildId }) {
-    const protection = { ...(config.protection || {}), ...guildConfig.get(guildId || "", "protection", {}) };
-    if (!protection?.channelId) {
+  init({ bus, config }) {
+    const protectionDefaults = config.protection || {};
+    const protection = protectionDefaults;\n    if (!protection?.channelId) {
       devLog.warn("[Protection] لم يتم تحديد channelId.");
       return;
     }
 
     bus.on("message:create", async (message) => {
       if (!guildFeatures.isEnabled(message.guildId, "protection", features.get("protection.enabled") === true)) return;
-      if (!message.guild || message.channelId !== protection.channelId) return;
-      await executeAction(message, protection);
+      if (!message.guild || message.channelId !== guildConfig.get(message.guildId, "protection.channelId", protection.channelId)) return;
+      await executeAction(message, { ...protection, ...(guildConfig.get(message.guildId, "protection", {}) || {}) });
     });
   }
 };
