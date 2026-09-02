@@ -1,4 +1,5 @@
 const features = require("./features");
+const guildConfig = require("./guildConfig");
 
 /**
  * Guild-scoped feature facade.
@@ -22,6 +23,7 @@ function isEnabled(guildId, feature, fallback = false) {
 function setEnabled(guildId, feature, enabled) {
   if (typeof enabled !== "boolean") throw new TypeError("enabled must be boolean");
   features.set(key(guildId, feature), enabled);
+  guildConfig.set(guildId, `feature.${feature}`, enabled);
 }
 
 function snapshot(guildId) {
@@ -30,7 +32,7 @@ function snapshot(guildId) {
     .reduce((out, k) => {
       out[k.slice(prefix.length)] = features.get(k);
       return out;
-    }, {});
+    }, { ...Object.keys(guildConfig.getAll(guildId)).filter((k) => k.startsWith("feature.")).reduce((out, k) => { out[k.slice(8)] = guildConfig.get(guildId, k); return out; }, {}) });
 }
 
 module.exports = { isEnabled, setEnabled, snapshot };
