@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { hasPermission } = require("../../../utils/permissions");
 const pendingActions = require("../../../utils/pendingActions");
+const caseManager = require("../../../utils/caseManager");
 
 const data = new SlashCommandBuilder()
   .setName("unban")
@@ -26,6 +27,7 @@ async function execute(interaction) {
   try {
     pendingActions.record(`unban:${userId}`, { executor: interaction.user, reason });
     await interaction.guild.members.unban(userId, reason);
+    caseManager.create({ guildId: interaction.guildId, action: "unban", target: { id: userId }, moderator: interaction.user, reason, source: "command" });
     await interaction.editReply({ content: `✅ تم إلغاء حظر العضو (${userId}).` });
   } catch (err) {
     await interaction.editReply({ content: `❌ ماقدرتش ألغي الحظر: ${err.message}` });
