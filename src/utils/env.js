@@ -16,7 +16,9 @@ function loadEnv() {
     clientId: process.env.CLIENT_ID || null,
     guildId: process.env.GUILD_ID || null,
     apiKey: process.env.DASHBOARD_API_KEY || null,
-    apiPort: Number(process.env.API_PORT || 3000)
+    apiPort: Number(process.env.API_PORT || 3000),
+    supabaseUrl: process.env.SUPABASE_URL || null,
+    supabaseKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || null
   };
 }
 
