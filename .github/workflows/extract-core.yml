@@ -1,9 +1,7 @@
 name: Extract CORE
 on:
   push:
-    paths:
-      - 'package-lock (1).zip'
-  workflow_dispatch:
+    branches: [main]
 jobs:
   extract:
     runs-on: ubuntu-latest
@@ -15,7 +13,6 @@ jobs:
         run: |
           mkdir -p .coderyx_extract
           unzip -o "package-lock (1).zip" -d .coderyx_extract
-          find .coderyx_extract -type f -print
       - name: Copy extracted project
         run: |
           shopt -s dotglob
