@@ -1,4 +1,6 @@
 const { Pool } = require("pg");
+const fs = require("fs");
+const path = require("path");
 
 let pool = null;
 
@@ -20,7 +22,7 @@ function getPool() {
   return pool;
 }
 
-async function health() {
+async function migrate() {\n  const sql = fs.readFileSync(path.join(__dirname, "..", "database", "schema.sql"), "utf8");\n  await getPool().query(sql);\n  return { ok: true };\n}\n\nasync function health() {
   if (!pool) return { ok: false, backend: "postgresql", configured: false };
   try {
     const result = await pool.query("SELECT NOW() AS now");
@@ -35,4 +37,4 @@ async function close() {
   pool = null;
 }
 
-module.exports = { initDatabase, getPool, health, close };
+module.exports = { initDatabase, getPool, migrate, health, close };
