@@ -1,6 +1,8 @@
 const features = require("../../utils/features");
 const logger = require("../../utils/logger");
 const devLog = require("../../utils/devLogger");
+const guildFeatures = require("../../utils/guildFeatures");
+const caseManager = require("../../utils/caseManager");
 
 function isExempt(member, config) {
   if (!member) return true;
@@ -38,7 +40,7 @@ async function executeAction(message, config) {
       success = await member.ban({ reason }).then(() => true).catch(() => false);
     }
 
-    await logger.general("protectionAction", {
+    if (success && action !== "delete") {\n      caseManager.create({\n        guildId: message.guildId,\n        action: `protection:${action}`,\n        target: member.user,\n        moderator: message.client.user,\n        reason,\n        duration: action === "timeout" ? Math.floor((config.timeoutMs || 600000) / 1000) : null,\n        source: "protection"\n      });\n    }\n\n    await logger.general("protectionAction", {
       title: success ? "🛡️ تم تنفيذ حماية القناة" : "⚠️ تعذر تنفيذ حماية القناة",
       fields: [
         { name: "المستخدم", value: "<@" + member.id + ">", inline: true },
@@ -68,7 +70,7 @@ module.exports = {
     }
 
     bus.on("message:create", async (message) => {
-      if (!features.get("protection.enabled")) return;
+      if (!guildFeatures.isEnabled(message.guildId, "protection", features.get("protection.enabled") === true)) return;
       if (!message.guild || message.channelId !== protection.channelId) return;
       await executeAction(message, protection);
     });
