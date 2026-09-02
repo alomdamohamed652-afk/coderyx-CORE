@@ -20,10 +20,12 @@ jobs:
           rm -rf .coderyx_extract
           rm -f "package-lock (1).zip"
           rm -f ".github/workflows/extract-core.yml"
+          rm -f ".env"
+          rm -f ".extract-trigger"
       - name: Commit extracted project
         run: |
           git config user.name "coderyx-extractor"
           git config user.email "actions@github.com"
           git add -A
-          git commit -m "Extract CORE project from archive" || exit 0
+          git commit -m "Extract CORE project from archive (without secrets)" || exit 0
           git push
