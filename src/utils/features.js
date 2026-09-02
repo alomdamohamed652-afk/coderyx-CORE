@@ -6,30 +6,23 @@ const FILE_PATH = path.join(__dirname, "..", "..", "data", "toggles.json");
 
 let state = {};
 
-/**
- * Features (Toggle Store)
- *
- * هذا هو المخزن الوحيد لحالة "تشغيل/إيقاف" التي يتحكم بها /dashboard وقت التشغيل.
- * يُحمَّل مرة واحدة عند بدء البوت بقيم افتراضية (من config/ أو من manifest الموديول)،
- * وبعد ذلك أي تغيير من /dashboard يُحفظ فوراً في data/toggles.json دون لمس أي ملف كونفيج
- * ودون الحاجة لإعادة تشغيل البوت.
- */
 function load(defaults) {
   const dir = path.dirname(FILE_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
   if (!fs.existsSync(FILE_PATH)) {
-    fs.writeFileSync(FILE_PATH, JSON.stringify(defaults, null, 2));
+    saveToDisk(defaults);
   }
 
   try {
     state = JSON.parse(fs.readFileSync(FILE_PATH, "utf8"));
+    if (!state || typeof state !== "object" || Array.isArray(state)) throw new Error("Expected a JSON object");
   } catch (err) {
     devLog.error(`[Features] ملف toggles.json تالف، سيتم استخدام القيم الافتراضية: ${err.message}`);
-    state = {};
+    state = { ...defaults };
+    saveToDisk(state);
   }
 
-  // أي مفتاح جديد ظهر بعد تحديث المشروع (موديول جديد مثلاً) يُضاف تلقائياً دون فقد القيم المحفوظة
   let changed = false;
   for (const [key, value] of Object.entries(defaults)) {
     if (!(key in state)) {
@@ -47,12 +40,20 @@ function get(key) {
 }
 
 function set(key, value) {
+  if (typeof value !== "boolean") throw new TypeError(`Feature "${key}" must be boolean`);
   state[key] = value;
   save();
 }
 
 function save() {
-  fs.writeFileSync(FILE_PATH, JSON.stringify(state, null, 2));
+  saveToDisk(state);
+}
+
+function saveToDisk(value) {
+  const dir = path.dirname(FILE_PATH);
+  const tempPath = `${FILE_PATH}.tmp`;
+  fs.writeFileSync(tempPath, JSON.stringify(value, null, 2), "utf8");
+  fs.renameSync(tempPath, FILE_PATH);
 }
 
 module.exports = { load, get, set };
