@@ -81,6 +81,15 @@ module.exports = {
     // افتراضي أول تشغيل فقط - بعدها يتحكم فيه /dashboard ("Voice Logs")
     enabled: true,
     channelId: "1520597235568611400",
+    // اختياري: قناة مختلفة لأحداث محددة. لو فارغة تستخدم channelId أعلاه.
+    eventChannels: {
+      serverMute: "",
+      serverUnmute: "",
+      serverDeafen: "",
+      serverUndeafen: "",
+      disconnect: "",
+      move: ""
+    },
     events: {
       join: true,
       leave: true,
